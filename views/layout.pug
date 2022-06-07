@@ -1,0 +1,21 @@
+doctype html
+html
+  head
+      block head
+        title="Express Starter App"
+        link(rel='stylesheet' href='/stylesheets/reset.css')
+  body
+    nav 
+      div
+        if locals.authenticated 
+          a(href='/') Home
+          span= user.username
+          form(action="/users/log-out", method="post") 
+            button(type="submit") Logout
+        else
+          a(href='/') Home
+          a(href='/users/sign-up') Sign Up 
+          a(href='/users/log-in') Log In
+
+
+    block content
