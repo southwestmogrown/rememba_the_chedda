@@ -9,6 +9,9 @@ block content
     select(name="task-lists")
         each list in lists
             option(value= list.id) #{list.name}  
-    form(action="/tasks/new", method="post")
-        input(type="text", name="new-task")
+    form(action="/tasks/new" class='newTaskForm' method="post")
+        input(type="text", class='newTaskInput' name="new-task")
         button(type="submit") Add New Task
+    if tasks 
+        for task in tasks
+            div= task.task

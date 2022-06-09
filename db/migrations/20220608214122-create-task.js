@@ -18,7 +18,8 @@ module.exports = {
         type: Sequelize.STRING(255)
       },
       completed: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       createdAt: {
         allowNull: false,

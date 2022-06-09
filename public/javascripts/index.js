@@ -21,7 +21,7 @@ window.addEventListener("load", (event)=>{
             const urlArray = window.location.href.split('/')
             const userId = urlArray[urlArray.length - 1];
             const name = document.querySelector('.addListInput').value;
-            await fetch('/new', {
+            await fetch('/lists/new', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
@@ -31,6 +31,27 @@ window.addEventListener("load", (event)=>{
             });
 
 
-        });  
+    }); 
+
+    document.querySelector('.newTaskForm')
+        .addEventListener('submit', async(e) => {
+            e.preventDefault();
+            const urlArray = window.location.href.split('/')
+            const userId = urlArray[urlArray.length - 1];
+            const task = document.querySelector('.newTaskInput').value;
+            const res = await fetch('/lists');
+            const lists = await res.json();
+            console.log(lists)
+            
+            console.log('***************')
+            // await fetch('/tasks/new', {
+            //     method: 'POST',
+            //     headers: {'Content-Type': 'application/json'},
+            //     body: JSON.stringify({
+            //         listId,
+            //         task
+            //     })
+            // });
+        });
 
 })

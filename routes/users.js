@@ -3,7 +3,7 @@ var router = express.Router();
 const bcrypt = require('bcryptjs')
 const { check, validationResult } = require('express-validator');
 
-const { User, List } = require('../db/models'); 
+const { User, List, Task } = require('../db/models'); 
 const { asyncHandler, csrfProtection } = require('./utils');
 const { loginUser, logoutUser } = require('../auth');
 
@@ -136,7 +136,7 @@ router.post('/log-out', asyncHandler(async(req, res) => {
 router.post('/demo', asyncHandler(async(req, res) => {
     const user = await User.findByPk(1)
     loginUser(req, res, user)
-    req.session.save(() => res.redirect(`/tasks/${user.id}`));
+    req.session.save(() => res.redirect(`/users/${user.id}`));
     
 }));
 
@@ -145,8 +145,11 @@ router.get('/:userId(\\d+)', asyncHandler(async(req, res) => {
     const user = await User.findByPk(userId, {
         include: List
     });
-    
-    res.render('home-page', { title: 'Home Page', lists: user.Lists })
+    const defaultListId = user.Lists[0].id;
+
+    const tasks = await Task.findAll({where: { listId: defaultListId}});
+
+    res.render('home-page', { title: 'Home Page', lists: user.Lists, tasks })
 }));
 
 
