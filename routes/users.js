@@ -3,7 +3,7 @@ var router = express.Router();
 const bcrypt = require('bcryptjs')
 const { check, validationResult } = require('express-validator');
 
-const { User } = require('../db/models'); 
+const { User, List } = require('../db/models'); 
 const { asyncHandler, csrfProtection } = require('./utils');
 const { loginUser, logoutUser } = require('../auth');
 
@@ -14,8 +14,8 @@ router.get('/', asyncHandler(async (req, res, next) => {
 }));
 
 router.get('/sign-up', csrfProtection, asyncHandler(async(req, res) => {
-    const newUser = {}
-    res.render('sign-up', { newUser, token: req.csrfToken()});
+    const newUser = User.build();
+    res.render('sign-up', { title: 'Sign Up', newUser, token: req.csrfToken()});
 }));
 
 const userValidators = [
@@ -66,9 +66,13 @@ router.post('/sign-up', csrfProtection, userValidators, asyncHandler(async(req, 
     if (validatorErrors.isEmpty()) {
         const hashedPassword = await bcrypt.hash(password, 10);
         newUser.hashedPassword = hashedPassword;
-        newUser.save();
+        await newUser.save();
+        await List.create({
+            name: `${newUser.username}'s Default List`,
+            userId: newUser.id
+        })
         loginUser(req, res, newUser)
-        return res.redirect('/');
+        req.session.save(() => res.redirect(`/tasks/${newUser.id}`)); 
     } else {
         const errors = validatorErrors.array().map(e => e.msg);
         console.log(errors)
@@ -110,7 +114,7 @@ router.post('/log-in', csrfProtection, loginValidators, asyncHandler(async(req, 
             console.log(passwordMatch)
             if (passwordMatch) {
                 loginUser(req, res, user)
-                return res.redirect('/');
+                return req.session.save(() => res.redirect(`/tasks/${user.id}`));
             }
         } 
         errors.push('Unable to login with these credentials.')
@@ -125,9 +129,26 @@ router.post('/log-in', csrfProtection, loginValidators, asyncHandler(async(req, 
 }));
 
 router.post('/log-out', asyncHandler(async(req, res) => {
-    console.log('here')
     logoutUser(req, res);
-    res.redirect('/users/log-in')
+    req.session.save(() => res.redirect('/users/log-in'));
 }));
+
+router.post('/demo', asyncHandler(async(req, res) => {
+    const user = await User.findByPk(1)
+    loginUser(req, res, user)
+    req.session.save(() => res.redirect(`/tasks/${user.id}`));
+    
+}));
+
+router.get('/:userId(\\d+)', asyncHandler(async(req, res) => {
+    const userId = req.params.userId;
+    const user = await User.findByPk(userId, {
+        include: List
+    });
+    
+    res.render('home-page', { title: 'Home Page', lists: user.Lists })
+}));
+
+
 
 module.exports = router;

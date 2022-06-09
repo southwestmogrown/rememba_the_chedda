@@ -7,7 +7,8 @@ block content
     form(action="/users/log-in", method="post") 
         input(type="hidden", name="_csrf", value=token)
         label(for='email') Email Address: 
-        input(type="text", name="email" value=demail)
+        input(type="text", name="email" value=email)
         label(for='password') Password: 
         input(type="password", name="password")
         button(type="submit") Log In
+    a(href="/users/sign-up") Not a member?

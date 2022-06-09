@@ -4,6 +4,7 @@ html
       block head
         title="Express Starter App"
         link(rel='stylesheet' href='/stylesheets/reset.css')
+        script(src="/javascripts/index.js" type="module") 
   body
     nav 
       div
@@ -16,6 +17,8 @@ html
           a(href='/') Home
           a(href='/users/sign-up') Sign Up 
           a(href='/users/log-in') Log In
+          form(action="/users/demo", method="post")
+            button(type="submit") Demo 
 
 
     block content
